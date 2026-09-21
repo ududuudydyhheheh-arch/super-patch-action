@@ -1,4 +1,4 @@
-name: Patch GSI to Samsung Super Image v.0.2
+name: Patch GSI to Samsung Super Image v.0.3
 
 on:
     workflow_dispatch:
@@ -43,10 +43,6 @@ on:
             NAME_REL:
                 description: 'Enter Name for Github Release'
                 required: true
-            FOLDER_HEADING:
-                description: 'Enter what directory it will land on Sourceforge (REQUIRES THAT DIRECTORY TO BE PRESENT THERE, DOUBLE CHECK IT PLEASE) ALSO PLEASE ADD SLASH "/" at the end'
-                required: true
-
 
 jobs:
     Building-GSI:
