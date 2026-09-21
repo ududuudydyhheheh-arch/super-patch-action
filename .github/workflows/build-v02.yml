@@ -111,7 +111,7 @@ jobs:
                             cd cmp_img
                             aria2c -x 10 "$GSILINK"
                             7za x *.xz
-                            cp *.img system.img
+                            cp super.img system.img
                             cd ..
                             ;;
                         "tar.xz")
@@ -119,7 +119,7 @@ jobs:
                             cd cmp_img
                             aria2c -x 10 "$GSILINK"
                             tar -xf *.tar.xz
-                            cp *.img system.img
+                            cp super.img system.img
                             cd ..
                             ;;
                         "zip")
