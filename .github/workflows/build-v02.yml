@@ -1,4 +1,4 @@
-name: Patch GSI to Samsung Super Image v.0.3
+name: Patch GSI to Samsung Super Image v.0.4
 
 on:
     workflow_dispatch:
@@ -39,6 +39,7 @@ on:
                     - 'xz'
                     - 'zip'
                     - 'tar'
+                    - 'gz'
                     - 'No compression'
             NAME_REL:
                 description: 'Enter Name for Github Release'
@@ -79,7 +80,6 @@ jobs:
                     sudo apt update
                     sudo apt upgrade -y
                     sudo apt install p7zip* aria2 wget android-tools* lz4 rsync zstd libprotobuf-dev brotli android-sdk-libsparse-utils
-                    # IDK TF AM I DOING
                     pwd >> dir.txt
                     LOCATION_POINT=$(pwd)
                     echo $LOCATION_POINT
@@ -135,6 +135,14 @@ jobs:
                             cd cmp_img
                             aria2c -x 10 "$GSILINK"
                             tar -xf *.tar
+                            cp *.img system.img
+                            cd ..
+                            ;;
+                        "gz")
+                            mkdir cmp_img
+                            cd cmp_img
+                            aria2c -x 10 "$GSILINK"
+                            gzip -d *.gz
                             cp *.img system.img
                             cd ..
                             ;;
@@ -204,7 +212,6 @@ jobs:
 
                 - name: Indexing Files
                   run: |
-                   # Tryna make sure lol
                    export DIR="$(pwd)/image_build"
                    export ODM="$DIR/odm.img"
                    export PRODUCT="$DIR/product.img"
@@ -212,7 +219,6 @@ jobs:
                    export SYSTEM_EXT="$DIR/system_ext.img"
                    export VENDOR="$DIR/vendor.img"
                    export SUPER="$DIR/super.img"
-                   # Add some temps
                    export TMP_ENVIRO="$(pwd)/tmp"
                    mkdir tmp
                    if [ -e "$DIR/super.img" ]; then
@@ -239,7 +245,6 @@ jobs:
                 
                 - name: Editing the Super.img
                   run: |
-                   # Tryna make sure lol
                    export DIR="$(pwd)/image_build"
                    export ODM="$DIR/odm.img"
                    export SYSTEM="$DIR/system.img"
@@ -247,7 +252,6 @@ jobs:
                    export SYSTEM_EXT="$DIR/system_ext.img"
                    export VENDOR="$DIR/vendor.img"
                    export SUPER="$DIR/super.img"
-                   # Add some temps
                    export TMP_ENVIRO="$(pwd)/tmp"
                    rm -rf $SYSTEM
                    mv cmp_img/system.img $SYSTEM
@@ -259,7 +263,6 @@ jobs:
                    
                 - name: Building the whole Super.img
                   run: |
-                   # Tryna make sure lol
                    export DIR="$(pwd)/image_build"
                    export ODM="$DIR/odm.img"
                    export PRODUCT="$DIR/product.img"
@@ -267,7 +270,6 @@ jobs:
                    export SYSTEM_EXT="$DIR/system_ext.img"
                    export VENDOR="$DIR/vendor.img"
                    export SUPER="$DIR/super.img"
-                   # Add some temps
                    export TMP_ENVIRO="$(pwd)/tmp"
                    rm -rf $SUPER
                    if [ "$(find $DIR/system.img -type f ! -size 0 -printf '%S\n' | sed 's/.\.[0-9]*//')" == 1 ]; then
@@ -304,7 +306,6 @@ jobs:
 
                 - name: Packing the image
                   run: |
-                   # Tryna make sure lol
                    export DIR="$(pwd)/image_build"
                    export PRODUCT="$DIR/product.img"
                    export ODM="$DIR/odm.img"
@@ -312,7 +313,6 @@ jobs:
                    export SYSTEM_EXT="$DIR/system_ext.img"
                    export VENDOR="$DIR/vendor.img"
                    export SUPER="$DIR/super.img"
-                   # Add some temps
                    export TMP_ENVIRO="$(pwd)/tmp"
                    export SELECT_SLIDER="${{ github.event.inputs.COMPRESSION_CHOICE }}"
                    export NAME_CHOICE="${{ github.event.inputs.NAME_ID }}"
@@ -341,7 +341,6 @@ jobs:
                             cp image_build/super.img rel/super.img
                            ;;
                     esac
-# DONT BLAME ME, BLAME THE CREATORS OF ARTIFACTS, NOT ALLOWING DIRECT FILE DETECTION UNLIKE GITHUB RELEASE
                 - name: Upload to Github Artifacts, tar
                   continue-on-error: true
                   uses: actions/upload-artifact@v4
@@ -359,7 +358,6 @@ jobs:
                       path: |
                           "rel/${{ github.event.inputs.NAME_ID }}.tar.xz"
                       compression-level: 9
-
 
                 - name: Upload to Github Artifacts, 7z
                   continue-on-error: true
@@ -392,17 +390,3 @@ jobs:
                             Recommend: Please Decompress/Extract the super.img file then flash it to your device
                   env:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                
-            
-
-                - name: Deploy to SourceForge
-                  uses: pressidium/lftp-mirror-action@v1
-                  with:
-                    host: frs.sourceforge.net
-                    port: 22
-                    user: ${{ secrets.SOURCEFORGE_USERNAME }}
-                    pass: ${{ secrets.SOURCEFORGE_PASSWORD }}
-                    localDir: './rel/'
-                    remoteDir: '/home/pfs/project/${{ secrets.SOURCEFORGE_REPO_TARGET }}/${{ github.event.inputs.FOLDER_HEADING }}'
-
- 
