@@ -170,7 +170,7 @@ jobs:
                     export VENDOR="$DIR/vendor.img"
                     export SUPER="$DIR/super.img"
                     aria2c -x 10 ${{ github.event.inputs.TAR_SUPER }}
-                    tar -xf *.tar
+                    tar -xf super.tar
                     mv super.img $DIR/
 
                 - name: Grabbing Super Image - LZ4
